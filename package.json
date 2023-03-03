@@ -1,0 +1,20 @@
+{
+  "name": "reto-platzi",
+  "version": "1.0.0",
+  "description": "Proyecto de practica de los cursos del reto 30 dias de javascript en Platzi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juanrossano/Reto-Platzi-js.git"
+  },
+  "keywords": [],
+  "author": "Juan Rossano",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/juanrossano/Reto-Platzi-js/issues"
+  },
+  "homepage": "https://github.com/juanrossano/Reto-Platzi-js#readme"
+}
