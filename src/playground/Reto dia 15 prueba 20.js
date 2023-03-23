@@ -60,6 +60,7 @@ console.log(hotel3.getAvailableRooms("01/01", "05/01"));
 function hotelSystem(rooms) {
     // Tu código aquí
     let reservas = [];
+    let totalHabitaciones = rooms;
 
     return {
       addReservation : function (reservation) { 
@@ -67,15 +68,33 @@ function hotelSystem(rooms) {
            if (elemento.roomNumber == reservation.roomNumber && 
              elemento.checkIn < reservation.checkOut &&
              elemento.checkOut > reservation.checkIn)
-             throw new Error("La reservación no fue encontrada");
+             throw new Error("La habitación no está disponible");
          });
          reservas.push(reservation);
-         return reservation;
+         return 'Reserva exitosa'; //reservation;
        },
        getReservations : function () {
         return reservas;
        },
-       getAvailableRooms : function (checkIn, checkOut) {},
+       getAvailableRooms : function (checkIn, checkOut) {
+        let lista = [];
+        for (let i=1;i<=totalHabitaciones;i++) {
+          let ocupada = false;
+          reservas.forEach(elemento => {
+            if (elemento.roomNumber == i && 
+              ((elemento.checkIn <= checkIn && elemento.checkIn <= checkOut) 
+              || (elemento.checkOut >= checkIn && elemento.checkOut >= checkOut)))
+              ocupada = true;
+          }
+/**
+ * if (ocupada == false) {
+            lista.push(i)}; */
+          )
+          if (ocupada == false) {
+            lista.push(i)};
+        }
+        return lista;
+       },
        searchReservation : function (id) {
         var existe = false;
         var reserva;
@@ -101,7 +120,7 @@ function hotelSystem(rooms) {
     }
 
 }
-  
+
 
 /**
 En este desafío deberás crear un sistema de administración para un hotel.
@@ -219,4 +238,100 @@ hotel.getAvailableRooms("01/01", "05/01")
 Output:
 
 [2, 3, 4, 5, 6, 7, 8, 10] 
- */
+*/
+
+function Solucion(rooms) {
+  const reservations = [];
+
+  function searchReservation(id) {
+    const index = reservations.findIndex((room) => room.id === id);
+
+    if (index > -1) {
+      return reservations[index];
+    }
+
+    throw new Error("La reservación no existe");
+  }
+
+  function getSortReservations() {
+    const copy = [...reservations];
+
+    copy.sort((a, b) => {
+      const aDate = new Date(`${a.checkIn} ${new Date().getFullYear()}`);
+      const bDate = new Date(`${b.checkIn} ${new Date().getFullYear()}`);
+      return aDate - bDate;
+    });
+
+    return copy;
+  }
+
+  function addReservation(reservation) {
+    if (!isAvailable(reservation)) {
+      throw new Error("La habitación se encuentra ocupada");
+    }
+
+    reservations.push(reservation);
+    return `La reservación de ${reservation.name} fue agendada exitosamente`;
+  }
+
+  function removeReservation(id) {
+    const index = reservations.findIndex((room) => room.id === id);
+
+    if (index > -1) {
+      const removedReservation = reservations[index];
+      reservations.splice(index, 1);
+      return removedReservation;
+    }
+
+    throw new Error("La habitación que se busca remover no existe");
+  }
+
+  function getReservations() {
+    return reservations;
+  }
+
+  function isAvailable(reservation) {
+    const checkIn = reservation.checkIn;
+    const checkOut = reservation.checkOut;
+
+    for (const currentReservation of reservations) {
+      const currentCheckIn = currentReservation.checkIn;
+      const currentCheckOut = currentReservation.checkOut;
+
+      if (
+        (checkIn >= currentCheckIn && checkIn < currentCheckOut) ||
+        (checkOut > currentCheckIn && checkOut <= currentCheckOut) ||
+        (checkIn <= currentCheckIn && checkOut >= currentCheckOut)
+      ) {
+        if (currentReservation.roomNumber === reservation.roomNumber) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  function getAvailableRooms(checkIn, checkOut) {
+    const availableRooms = [];
+
+    for (let i = 1; i <= rooms; i++) {
+      const reservation = { checkIn, checkOut, roomNumber: i };
+
+      if (isAvailable(reservation)) {
+        availableRooms.push(i);
+      }
+    }
+    return availableRooms;
+  }
+
+  return {
+    searchReservation,
+    getSortReservations,
+    addReservation,
+    removeReservation,
+    getReservations,
+    getAvailableRooms,
+  };
+
+}

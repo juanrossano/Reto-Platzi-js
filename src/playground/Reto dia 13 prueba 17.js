@@ -23,21 +23,19 @@ console.log(searchValue(array2, value2));
 
 function searchValue(array, value) {
     // Tu código aquí 👈
-    let row = -1;
-    let column = -1;
-  
-    console.log(value);
-  
-    for (var x = 0; x < array.length; x++) {
-      for (var y = 0; y < array[x].length; y++) {
-        if (array[x][y] == value) {
-          row = x;
-          column = y;
-          return { row: x, column: y };
-        }
+    let productsname = "";
+    let totalPrice = 0;
+
+    products.forEach(elemento => {
+      if (elemento.category == category) {
+        if (productsname === "") 
+          productsname += elemento.name;
+        else
+          productsname += ", " + elemento.name;
+        totalPrice += elemento.price;
       }
-    }
-    throw new Error("Valor no encontrado");
+    });
+    return {products: productsname, totalPrice: totalPrice};
 }
 
 /**
@@ -85,4 +83,17 @@ const array = [
 const value = 45;
 
 Output: "Valor no encontrado"
- */
+*/
+
+function Solucion(array, value) {
+  const singleArray = array.flatMap((x) => x);
+  const index = singleArray.findIndex((val) => val === value);
+  if (index === -1) {
+    throw new Error("Valor no encontrado");
+  }
+
+  const row = Math.floor(index / array[0].length);
+  const column = index % array[0].length;
+
+  return { row, column };
+}
