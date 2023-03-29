@@ -4,9 +4,75 @@ console.log("Implementa un sistema de pagos usando polimorfismo");
 
 function processPay(method, quantity) {
     // Tu código aquí 👈
+    return method.makePay(quantity)
 }
 
-  
+class Pay {
+  // Tu código aquí 👈
+  constructor() {}
+  makePay( cantidadAPagar) {
+    this.quantity = cantidadAPagar;
+    return { realized: true, quantity: this.quantity}
+  }
+}
+
+class PayPal extends Pay {
+  // Tu código aquí 👈
+  constructor( pemail) {
+    super();
+    this.email = pemail;
+  }
+  makePay(cantidadAPagar) {
+    this.platform = "PayPal";
+    return {
+      ...super.makePay(cantidadAPagar),
+      platform: this.platform,
+      email: this.email
+    };
+  }
+}
+
+class Cash extends Pay {
+  // Tu código aquí 👈
+  makePay(cantidadAPagar) {
+    this.platform = "Cash";
+    return {
+      ...super.makePay(cantidadAPagar)
+    };
+  }
+}
+
+class Card extends Pay {
+  // Tu código aquí 👈
+  constructor( NumeroDeTarjeta) {
+    super();
+    if (NumeroDeTarjeta.length == 16) {
+      this.CardNumber = NumeroDeTarjeta;
+//      this.lastCardNumbers = (NumeroDeTarjeta % 10000).toString();
+        this.lastCardNumbers = this.CardNumber.toString().slice(-4)
+      } else
+      {
+        throw new Error("La longitud no es la correcta");
+      }
+    }
+    makePay(cantidadAPagar) {
+      if (this.CardNumber.length !== 16) {
+        throw new Error("La longitud no es la correcta");
+      }
+      this.platform = "Card";
+      return {
+        ...super.makePay(cantidadAPagar),
+        lastCardNumbers: this.lastCardNumbers
+      };
+    }
+}
+
+/** Test */
+
+const card = new Card("4913478952471122")
+
+console.log(processPay(card, 100));
+
 /**
 * En este desafío, tendrás que implementar un sistema de pagos utilizando polimorfismo en JavaScript.
 
@@ -74,5 +140,72 @@ Output:
 {
   realized: true,
   quantity: 400,
+}
+*/
+
+/*
+*** -> Solucion
+export function processPay(method, quantity) {
+  return method.makePay(quantity);
+}
+
+export class Pay {
+
+  constructor() {}
+
+  makePay(quantity) {
+    return {
+      realized: true,
+      quantity,
+    };
+  }
+}
+
+import { Pay } from "./Pay.class.js";
+
+export class PayPal extends Pay {
+
+  constructor(email) {
+    super();
+    this.email = email;
+  }
+
+  makePay(quantity) {
+    return {
+      ...super.makePay(quantity),
+      platform: "PayPal",
+      email: this.email,
+    };
+  }
+}
+
+import { Pay } from "./Pay.class.js";
+
+export class Card extends Pay {
+  constructor(cardNumber) {
+    super();
+    this.cardNumber = cardNumber;
+  }
+
+  makePay(quantity) {
+    if (this.cardNumber.length !== 16) {
+      throw new Error("Tarjeta invalida");
+    }
+
+    const lastCardNumbers = this.cardNumber.toString().slice(-4);
+
+    return {
+      ...super.makePay(quantity),
+      lastCardNumbers,
+    };
+  }
+}
+
+import { Pay } from "./Pay.class.js";
+
+export class Cash extends Pay {
+  constructor() {
+    super();
+  }
 }
 */

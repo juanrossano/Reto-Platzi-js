@@ -1,7 +1,127 @@
 // console.log();
 console.log("Agenda de vuelos");
 
+class Flight {
+  constructor(origin, destination, date, capacity, price) {
+    // Tu código aquí 👈
+    this.origin = origin // (origen), 
+    this.destination = destination // (destino), 
+    this.date = date // (fecha de salida), 
+    this.capacity = capacity // (capacidad máxima), 
+    this.price = price // (precio) e inicilizará una variable llamada 
+    this.passengers = [] // array de pasajeros
+  }
 
+  sellTicket(passenger) {
+    // Tu código aquí 👈
+    if (this.capacity > 0) {
+      const vuelo = new Reservation(this, passenger);
+      this.passengers.push({fullName: passenger.name + " " + passenger.lastName, age: passenger.age});
+      passenger.addFlight(this.origin, this.destination, this.date, this.price)
+      this.capacity--;
+      return vuelo;
+    }
+  }
+}
+
+class Passenger {
+  // Tu código aquí 👈
+  constructor(name, lastName, age) {
+    this.name = name; // nombre, 
+    this.lastName = lastName; // apellido 
+    this.age = age; // edad
+    this.flights = [] // lista de vuelos
+  }
+
+  addFlight(origin, destination, date, price) {
+    this.flights.push({
+      origin: origin, 
+      destination: destination, 
+      date: date, 
+      price: price}) 
+  }
+}
+class Reservation {
+  constructor(flight, passenger) {
+    // Tu código aquí 👈
+    this.flight = flight;
+    this.passenger = passenger;
+//    passenger.addFlight(flight.origin, flight.destination, flight.date, flight.price)
+  }
+
+  reservationDetails() {
+    // Tu código aquí 👈
+    return {origin: this.flight.origin, 
+            destination: this.flight.destination, 
+            date: this.flight.date, 
+            reservedBy: this.passenger.name + " " + this.passenger.lastName};
+  }
+}
+
+class PremiumFlight extends Flight {
+  constructor(origin, destination, date, capacity, price, specialService) {
+    // Tu código aquí 👈
+    super(origin, destination, date, capacity, price + specialService);
+    this.specialService = specialService;
+  }
+
+  sellTicket(passenger) {
+    // Tu código aquí 👈
+    const especifico = super.sellTicket(passenger)
+    especifico.price += this.specialService;
+    return especifico;
+  }
+}
+
+class EconomicFlight extends Flight {
+  constructor(origin, destination, date, capacity, price) {
+    // Tu código aquí 👈
+    super(origin, destination, date, capacity, price);
+  }
+
+  sellTicket(passenger) {
+    // Tu código aquí 👇
+    let especifico = super.sellTicket(passenger)
+    if (passenger.age < 18 || passenger.age > 65) {
+      this.price *= 0.8;
+      especifico.price *= .8;
+    }
+    return especifico;
+  }
+}
+
+/** Test */
+const flight1 = new Flight("CDMX", "Guadalajara", "2022-01-01", 5, 1000);
+
+const passenger1 = new Passenger("Juan", "Perez", 30);
+
+const reservation1 = flight1.sellTicket(passenger1);
+
+console.log(passenger1.flights)
+
+const flight2 = new Flight("CDMX", "Guadalajara", "2022-01-01", 5, 1000);
+const passenger2 = new Passenger("Juan", "Perez", 30);
+
+const reservation2 = flight2.sellTicket(passenger2);
+
+console.log(flight2.passengers)
+
+
+const flight3 = new EconomicFlight(
+  "New York",
+  "Paris",
+  "2023-12-25",
+  100,
+  200
+);
+
+const passenger3 = new Passenger("Pedro", "Gutierrez", 17);
+
+const reservation3 = flight3.sellTicket(passenger3);
+
+console.log(reservation3.flight.price)
+
+/*
 import { Flight } from "./Flight";
 import { Reservation } from "./Reservation";
 
@@ -10,6 +130,8 @@ export class EconomicFlight extends Flight {
     // Tu código aquí 👇
   }
 }
+*/
+
 
 /**
 * En este desafío crearas un Sistema de reservaciones de vuelos.
@@ -85,4 +207,145 @@ const reservation = flight.sellTicket(passenger);
 console.log(reservation.flight.price)
 
 Output: 160
+*/
+
+
+/*
+*** => Solucion
+
+class Flight {
+  constructor(origin, destination, date, capacity, price) {
+    this.origin = origin;
+    this.destination = destination;
+    this.date = date;
+    this.capacity = capacity;
+    this.price = price;
+    this.passengers = [];
+  }
+
+  sellTicket(passenger) {
+    if (this.capacity > 0) {
+      this.capacity -= 1;
+      const reservation = new Reservation(this, passenger);
+
+      this.passengers.push(reservation.confidentialData);
+      passenger.addFlight(this);
+
+      return reservation;
+    }
+  }
+}
+
+class Passenger {
+  constructor(name, lastName, age) {
+    this.name = name;
+    this.lastName = lastName;
+    this.age = age;
+    this.flights = [];
+  }
+
+  addFlight(flight) {
+    this.flights.push({
+      origin: flight.origin,
+      destination: flight.destination,
+      date: flight.date,
+      price: flight.price,
+    });
+  }
+}
+
+class Reservation {
+  constructor(flight, passenger) {
+    this.flight = flight;
+    this.passenger = passenger;
+  }
+
+  get confidentialData() {
+    return (() => {
+      const fullName = `${this.passenger.name} ${this.passenger.lastName}`;
+      const age = this.passenger.age;
+
+      return {
+        fullName,
+        age,
+      };
+    })();
+  }
+
+  reservationDetails() {
+    const flight = this.flight;
+    const passenger = this.confidentialData;
+
+    return {
+      origin: flight.origin,
+      destination: flight.destination,
+      date: flight.date,
+      reservedBy: passenger.fullName,
+    };
+  }
+}
+
+class PremiumFlight extends Flight {
+  constructor(origin, destination, date, capacity, price, specialService) {
+    super(origin, destination, date, capacity, price);
+    this.specialService = specialService;
+  }
+
+  sellTicket(passenger) {
+    if (this.capacity > 0) {
+      this.capacity -= 1;
+      const reservation = new Reservation(this, passenger);
+
+      this.passengers.push(reservation.confidentialData);
+      passenger.addFlight(this);
+      this.price += this.specialService;
+
+      return reservation;
+    }
+  }
+}
+
+class EconomicFlight extends Flight {
+  sellTicket(passenger) {
+    if (this.capacity > 0) {
+      this.capacity -= 1;
+      const reservation = new Reservation(this, passenger);
+
+      this.passengers.push(reservation.confidentialData);
+      passenger.addFlight(this);
+
+      if (passenger.age < 18 || passenger.age > 65) {
+        this.price *= 0.8;
+      }
+
+      return reservation;
+    }
+  }
+}
+
+
+*/
+
+/*
+Should add a flight to passenger
+
+expect(received).toEqual(expected) // deep equality
+
+- Expected - 0
++ Received + 6
+
+Array [
+Object {
+"date": "2022-01-01",
+"destination": "Guadalajara",
+"origin": "CDMX",
+"price": 1000,
+},
++ Object {
++ "date": "2022-01-01",
++ "destination": "Guadalajara",
++ "origin": "CDMX",
++ "price": 1000,
++ },
+]
 */
